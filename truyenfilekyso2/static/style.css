@@ -1,0 +1,23 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 2rem;
+  background: #f0f0f0;
+}
+h1 {
+  color: #333;
+}
+form {
+  margin-bottom: 2rem;
+}
+textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 1rem;
+}
+button {
+  padding: 0.5rem 1rem;
+  background: #0077cc;
+  color: white;
+  border: none;
+  cursor: pointer;
+}

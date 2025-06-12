@@ -1,0 +1,124 @@
+Đây là mã nguồn thử nghiệm (dự phòng)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SafeChat AES</title>
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script defer src="script.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen">
+  <div class="bg-gray-800 p-6 rounded-xl shadow-xl w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-4 text-center">🔒 SafeChat AES</h1>
+    <input id="keyInput" type="text" placeholder="Nhập khóa mã hóa" class="w-full mb-3 p-2 rounded bg-gray-700 text-white">
+    <div id="chatBox" class="h-60 overflow-y-scroll bg-gray-700 rounded p-3 mb-3"></div>
+    <textarea id="messageInput" placeholder="Nhập tin nhắn..." class="w-full p-2 rounded bg-gray-700 text-white mb-3"></textarea>
+    <button id="sendBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">Gửi</button>
+  </div>
+</body>
+</html>
+
+const socket = io();
+const chatBox = document.getElementById("chatBox");
+const messageInput = document.getElementById("messageInput");
+const keyInput = document.getElementById("keyInput");
+const sendBtn = document.getElementById("sendBtn");
+
+sendBtn.onclick = () => {
+  const message = messageInput.value;
+  const key = keyInput.value;
+
+  if (!key || !message) return alert("Vui lòng nhập cả khóa và tin nhắn!");
+
+  const encrypted = CryptoJS.AES.encrypt(message, key).toString();
+  socket.emit("message", encrypted);
+  appendMessage("🧑‍💻 Bạn", message);
+  messageInput.value = "";
+};
+
+socket.on("message", (encrypted) => {
+  const key = keyInput.value;
+  try {
+    const decrypted = CryptoJS.AES.decrypt(encrypted, key).toString(CryptoJS.enc.Utf8);
+    if (decrypted) {
+      appendMessage("👤 Người khác", decrypted);
+    } else {
+      appendMessage("❗", "[Khóa sai hoặc tin nhắn không giải mã được]");
+    }
+  } catch {
+    appendMessage("❗", "[Lỗi giải mã]");
+  }
+});
+
+function appendMessage(sender, text) {
+  const msg = document.createElement("div");
+  msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+app.use(express.static("public")); // chứa file frontend
+
+io.on("connection", (socket) => {
+  console.log("🔌 Client connected");
+
+  socket.on("message", (data) => {
+    // broadcast cho tất cả clients
+    socket.broadcast.emit("message", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("❌ Client disconnected");
+  });
+});
+
+server.listen(3000, () => {
+  console.log("🚀 Server running at http://localhost:3000");
+});
+
+
+
+
+
+
+t2
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SafeChat AES</title>
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script defer src="script.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen">
+  <div class="bg-gray-800 p-6 rounded-xl shadow-xl w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-4 text-center">🔒 SafeChat AES</h1>
+
+    <input id="usernameInput" type="text" placeholder="Nhập tên của bạn" class="w-full mb-2 p-2 rounded bg-gray-700 text-white">
+    <input id="keyInput" type="text" placeholder="Nhập khóa mã hóa" class="w-full mb-3 p-2 rounded bg-gray-700 text-white">
+
+    <select id="userSelect" class="w-full p-2 rounded mb-3 bg-gray-700 text-white">
+      <option value="">🌍 Gửi tới tất cả</option>
+    </select>
+
+    <div id="chatBox" class="h-60 overflow-y-scroll bg-gray-700 rounded p-3 mb-3"></div>
+    <textarea id="messageInput" placeholder="Nhập tin nhắn..." class="w-full p-2 rounded bg-gray-700 text-white mb-3"></textarea>
+    <button id="sendBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">Gửi</button>
+  </div>
+</body>
+
+</html>

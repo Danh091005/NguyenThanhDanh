@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Người Nhận - Xác Minh Chữ Ký Số</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #e0f7fa, #ede7f6);
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .card {
+      max-width: 600px;
+      width: 100%;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      background-color: white;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .result {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 class="text-center mb-4 text-primary">🔐 Xác Minh Chữ Ký Số</h2>
+    <form id="verifyForm">
+      <div class="mb-3">
+        <label class="form-label">📁 Chọn file gốc:</label>
+        <input type="file" class="form-control" name="file" required />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">📝 Chữ ký số (Base64):</label>
+        <textarea class="form-control" name="signature" id="sigField" required placeholder="Dán chữ ký vào đây..."></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">🔑 Public Key (PEM):</label>
+        <textarea class="form-control" name="public_key" required placeholder="Dán khóa công khai vào đây..."></textarea>
+      </div>
+      <div class="d-grid">
+        <button type="submit" class="btn btn-success">✅ Xác Minh</button>
+      </div>
+    </form>
+
+    <div id="verifyResult" class="mt-4 text-center result"></div>
+  </div>
+
+  <script>
+    window.onload = () => {
+      const sig = sessionStorage.getItem("sig");
+      if (sig) document.getElementById("sigField").value = sig;
+    };
+
+    document.getElementById("verifyForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const res = await fetch("/verify", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      const resultDiv = document.getElementById("verifyResult");
+      if (data.valid) {
+        resultDiv.innerHTML = "<span class='text-success'>✅ Chữ ký hợp lệ. File chưa bị sửa đổi.</span>";
+      } else {
+        resultDiv.innerHTML = "<span class='text-danger'>❌ Chữ ký không hợp lệ hoặc file đã bị chỉnh sửa!</span>";
+      }
+    };
+  </script>
+</body>
+</html>
